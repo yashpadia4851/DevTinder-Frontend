@@ -19,7 +19,7 @@ const Body = () => {
         withCredentials: true,
       });
 
-      dispatch(addUser(response.data));
+      dispatch(addUser(response.data.data || response.data));
     } catch (err) {
       console.log("err", err);
       if (err.status == 401) {
@@ -37,7 +37,7 @@ const Body = () => {
     <div>
       <Navbar />
       <Outlet />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
