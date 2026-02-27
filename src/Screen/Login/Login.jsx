@@ -10,6 +10,7 @@ import DevelopersImg from "../../assets/Developers.png";
 const Login = () => {
   const [emailId, SetEmailId] = useState("Trump@gmail.com");
   const [password, SetPassword] = useState("Trump444...");
+  const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -20,6 +21,7 @@ const Login = () => {
     }
 
     try {
+      setErrorMessage("");
       const response = await axios.post(
         APP_URL + "/login",
         { emailId, password },
@@ -29,7 +31,9 @@ const Login = () => {
       dispatch(addUser(response.data));
       navigate("/");
     } catch (err) {
-      alert(err?.response?.data || err.message || "Login failed");
+      const message =
+        err?.response?.data || err.message || "Login failed";
+      setErrorMessage(message);
     }
   };
 
@@ -61,6 +65,10 @@ const Login = () => {
             onChange={(e) => SetPassword(e.target.value)}
             placeholder="Password"
           />
+
+          {errorMessage && (
+            <p className="mt-2 text-sm text-red-300">{errorMessage}</p>
+          )}
 
           <button className="btn btn-neutral mt-4 w-full" onClick={handleLogin}>
             Login
