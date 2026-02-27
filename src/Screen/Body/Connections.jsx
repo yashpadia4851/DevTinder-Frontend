@@ -9,34 +9,24 @@ import { setConnections } from "../../Utils/connectionsSlice";
 const Connections = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { data, status, error } = useSelector((state) => state.connections);
-
+  const { data, error } = useSelector((state) => state.connections);
+  console.log("data", data);
   const fetchConnections = async () => {
-    if (status === "loading") return;
-
     try {
-      dispatch(setConnectionsLoading());
       const res = await axios.get(APP_URL + "/user/connections", {
         withCredentials: true,
       });
-
-      dispatch(setConnections(res.data?.data || []));
+      console.log("connection res", res);
+      dispatch(setConnections(res.data.data || []));
     } catch (err) {
       const statusCode = err?.response?.status;
       if (statusCode === 401) navigate("/login");
-
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data ||
-        err.message ||
-        "Failed to load connections";
-      dispatch(setConnectionsError(message));
     }
   };
 
   useEffect(() => {
-    if (status === "idle") fetchConnections();
-  }, [status]);
+    fetchConnections();
+  }, []);
 
   return (
     <div className="min-h-[calc(100vh-5rem)] px-4 py-10">
@@ -58,29 +48,23 @@ const Connections = () => {
             </p>
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={fetchConnections}
             className="btn btn-sm btn-ghost"
             disabled={status === "loading"}
           >
             {status === "loading" ? "Refreshing..." : "Refresh"}
-          </button>
+          </button> */}
         </div>
 
-        {status === "loading" && (
+        {/* {status === "loading" && (
           <div className="flex justify-center py-16">
             <span className="loading loading-spinner loading-lg" />
           </div>
-        )}
+        )} */}
 
-        {status === "failed" && (
-          <div className="alert alert-error shadow-lg">
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-
-        {status === "succeeded" && data.length === 0 && (
+        {data.length === 0 && (
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body items-center text-center">
               <h2 className="card-title">No connections yet</h2>
@@ -91,7 +75,7 @@ const Connections = () => {
           </div>
         )}
 
-        {status === "succeeded" && data.length > 0 && (
+        {data.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.map((c, idx) => (
               <div
