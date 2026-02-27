@@ -6,7 +6,6 @@ import { APP_URL } from "../../Utils/constants";
 import { addUser } from "../../Utils/UserSlice";
 
 const EditProfile = ({ user }) => {
-  console.log("userchild", user);
   const [isEditing, setIsEditing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
@@ -54,7 +53,7 @@ const EditProfile = ({ user }) => {
       const res = await axios.patch(APP_URL + "/profile/edit", payload, {
         withCredentials: true,
       });
-      console.log("edit done  ", res);
+      // console.log("edit done  ", res);
 
       const updatedUser = res.data.data || res.data;
       dispatch(addUser(updatedUser));
