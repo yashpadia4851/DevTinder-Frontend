@@ -145,7 +145,6 @@ const EditProfile = ({ user }) => {
             >
               <span className="text-lg">💖</span>
               <span>Edit info</span>
-              <span className="text-xs text-gray-500">(26% complete)</span>
             </button>
           </div>
         </div>

@@ -84,13 +84,14 @@ const Requests = () => {
 
         {/* Empty */}
         {!loading && data.length === 0 && (
-          <div className="flex flex-col items-center justify-center text-center min-h-[60vh]">
-            <h2 className="text-4xl font-bold text-base-content mb-4">
-              No Requests Yet
-            </h2>
-            <p className="text-lg text-base-content/60 max-w-md">
-              When someone sends you a connection request, it will appear here.
-            </p>
+          <div className="card bg-base-200 shadow-xl">
+            <div className="card-body items-center text-center">
+              <h2 className="card-title"> No Requests Yet</h2>
+              <p className="text-sm text-base-content/70">
+                When someone sends you a connection request, it will appear
+                here.
+              </p>
+            </div>
           </div>
         )}
 

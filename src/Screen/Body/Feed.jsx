@@ -36,7 +36,7 @@ const Feed = () => {
   }, []);
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center px-4">
+    <div className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center px-4 overflow-visible">
       
       {/* Loading */}
       {loading && (
@@ -57,9 +57,12 @@ const Feed = () => {
         </div>
       )}
 
-      {/* Show Card */}
+      {/* Card Stack - next card behind, current on top */}
       {!loading && usersData.length > 0 && (
-        <UserCard users={usersData[0]} />
+        <div className="relative w-full max-w-sm min-h-[70vh] flex items-center justify-center overflow-visible">
+          {usersData[1] && <UserCard key={usersData[1]._id} users={usersData[1]} isBack />}
+          <UserCard key={usersData[0]._id} users={usersData[0]} />
+        </div>
       )}
     </div>
   );
