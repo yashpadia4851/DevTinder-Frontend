@@ -1,10 +1,29 @@
+import axios from "axios";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { removeFeedUser } from "../../Utils/feedSlice";
+import { APP_URL } from "../../Utils/constants";
 
 const UserCard = ({ users }) => {
   console.log("users", users);
   if (!users) return null;
 
-  const { firstName, lastName, about, gender, photoURL, age } = users;
+  const dispatch = useDispatch();
+
+  const { _id, firstName, lastName, about, gender, photoURL, age } = users;
+
+  const handleRequest = async (status, userId) => {
+    try {
+      const res = await axios.post(
+        APP_URL + "/request/send/" + status + "/" + userId,
+        {},
+        { withCredentials: true },
+      );
+      dispatch(removeFeedUser(userId));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center w-full min-h-[70vh] px-4">
@@ -49,11 +68,17 @@ const UserCard = ({ users }) => {
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-6 mt-6 w-full">
-            <button className="btn flex-1 bg-base-200 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition">
+            <button
+              onClick={() => handleRequest("ignored", _id)}
+              className="btn flex-1 bg-base-200 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition"
+            >
               Ignore ✕
             </button>
 
-            <button className="btn flex-1 bg-base-200 border border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white transition">
+            <button
+              onClick={() => handleRequest("interested", _id)}
+              className="btn flex-1 bg-base-200 border border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white transition"
+            >
               Interested ➤
             </button>
           </div>

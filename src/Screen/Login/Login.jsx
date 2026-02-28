@@ -78,7 +78,7 @@ const Login = () => {
           className="rounded-xl p-6 shadow-2xl bg-linear-to-b from-pink-900/80 via-purple-900/80 to-slate-900/80 backdrop-blur-md"
         >
           <h2 className="text-2xl font-bold text-white text-center mb-6">
-            {isSignup ? "Create Account" : "Login First"}
+            {isSignup ? "Create Account" : "Login"}
           </h2>
 
           {isSignup && (

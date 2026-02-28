@@ -59,7 +59,7 @@ const Feed = () => {
 
       {/* Show Card */}
       {!loading && usersData.length > 0 && (
-        <UserCard users={usersData[6]} />
+        <UserCard users={usersData[0]} />
       )}
     </div>
   );

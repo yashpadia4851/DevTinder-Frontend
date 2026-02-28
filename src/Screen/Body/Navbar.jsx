@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { APP_URL } from "../../Utils/constants";
-import { removeUser } from "../../Utils/UserSlice";
+import { removeFeedUser } from "../../Utils/UserSlice";
 
 const Navbar = () => {
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
@@ -17,7 +17,7 @@ const Navbar = () => {
     } catch (error) {
       console.error("Logout error", error);
     } finally {
-      dispatch(removeUser());
+      // dispatch(removeFeedUser());
       navigate("/login");
     }
   };
