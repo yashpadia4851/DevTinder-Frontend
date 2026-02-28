@@ -1,49 +1,62 @@
 import React from "react";
 
 const UserCard = ({ users }) => {
+  console.log("users", users);
   if (!users) return null;
 
   const { firstName, lastName, about, gender, photoURL, age } = users;
+
   return (
-    <div className="card bg-base-100 w-96 shadow-sm">
-      <div className="hover-3d">
-        {/* content */}
-        <figure className="max-w-100 rounded-2xl">
-          <img src={photoURL} alt="3D card" />
-        </figure>
-        {/* 8 empty divs needed for the 3D effect */}
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-      <div className="card-body items-center text-center">
-        <h2 className="card-title">
-          {firstName + " " + lastName}
-          <div className="badge badge-secondary">NEW</div>
-        </h2>
-        <p className="line-clamp-3">{age && gender && age + " " + gender}</p>
-        <p className="line-clamp-3">{about}</p>
-        <div className="card-actions mt-4 w-full flex justify-center gap-4">
-          {/* <button className="btn btn-circle bg-base-200 border-0 shadow-md text-xl text-orange-400">
-            ↺
-          </button> */}
-          <button className="btn btn-circle bg-base-200 border-0 shadow-md text-xl text-pink-500">
-            ✕
-          </button>
-          {/* <button className="btn btn-circle bg-base-200 border-0 shadow-md text-xl text-sky-400">
-            ★
-          </button> */}
-          {/* <button className="btn btn-circle bg-base-200 border-0 shadow-md text-xl text-green-400">
-            ❤
-          </button> */}
-          <button className="btn btn-circle bg-base-200 border-0 shadow-md text-xl text-sky-400">
-            ➤
-          </button>
+    <div className="flex justify-center items-center w-full min-h-[70vh] px-4">
+      <div className="w-full max-w-sm bg-base-100 border border-base-300 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02]">
+        {/* Image Section */}
+        <div className="hover-3d w-full h-64 bg-base-200 flex items-center justify-center overflow-hidden">
+          {/* content */}
+
+          {photoURL ? (
+            <figure className="max-w-100 rounded-2xl w-24 h-24 object-cover">
+              <img src={photoURL} alt="3D card" />
+            </figure>
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-base-300 flex items-center justify-center text-2xl font-bold">
+              {firstName?.charAt(0)?.toUpperCase()}
+            </div>
+          )}
+          {/* 8 empty divs needed for the 3D effect */}
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        {/* Content Section */}
+        <div className="p-6 text-center">
+          <h2 className="text-xl font-bold flex justify-center items-center gap-2">
+            {firstName} {lastName}
+            <span className="badge badge-secondary">NEW</span>
+          </h2>
+
+          <p className="text-sm text-base-content/70 mt-2">
+            {age ? `${age}` : ""} {gender ? `• ${gender}` : ""}
+          </p>
+
+          <p className="text-sm text-base-content/80 mt-3 line-clamp-3 break-words">
+            {about || "No bio available."}
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-6 mt-6 w-full">
+            <button className="btn flex-1 bg-base-200 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition">
+              Ignore ✕
+            </button>
+
+            <button className="btn flex-1 bg-base-200 border border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white transition">
+              Interested ➤
+            </button>
+          </div>
         </div>
       </div>
     </div>
