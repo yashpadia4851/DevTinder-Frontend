@@ -1,215 +1,127 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { sendRequest } from "../../api/feedApi";
 import { removeFeedUser } from "../../store/slices/feedSlice";
 
-const SWIPE_THRESHOLD = 80;
-const EXIT_VELOCITY = 500;
-const ANIMATION_DURATION_MS = 300;
-
-const CardContent = ({ user }) => {
-  const { firstName, lastName, about, gender, photoURL, age } = user;
-  return (
-    <>
-      <div className="w-full h-64 bg-base-200 flex items-center justify-center overflow-hidden rounded-t-2xl">
-        {photoURL ? (
-          <figure className="rounded-2xl w-24 h-24 object-cover">
-            <img src={photoURL} alt="Profile" />
-          </figure>
-        ) : (
-          <div className="w-24 h-24 rounded-full bg-base-300 flex items-center justify-center text-2xl font-bold">
-            {firstName?.charAt(0)?.toUpperCase()}
-          </div>
-        )}
-      </div>
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-bold flex justify-center items-center gap-2">
-          {firstName} {lastName}
-          <span className="badge badge-secondary">NEW</span>
-        </h2>
-        <p className="text-sm text-base-content/70 mt-2">
-          {age ? `${age}` : ""} {gender ? `• ${gender}` : ""}
-        </p>
-        <p className="text-sm text-base-content/80 mt-3 line-clamp-3 break-words">
-          {about || "No bio available."}
-        </p>
-      </div>
-    </>
-  );
-};
+const SWIPE_THRESHOLD = 120;
 
 const UserCard = ({ users, isBack = false }) => {
   const dispatch = useDispatch();
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
-  const startXRef = useRef(0);
-  const cardRef = useRef(null);
   const { _id } = users;
 
-  useEffect(() => {
-    setDragX(0);
-    setIsDragging(false);
-    setIsExiting(false);
-  }, [_id]);
+  // Track drag position
+  const x = useMotionValue(0);
 
-  const handleRequest = useCallback(
-    async (status, userId) => {
-      try {
-        await sendRequest(status, userId);
-        dispatch(removeFeedUser(userId));
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [dispatch],
-  );
+  // Rotate based on drag
+  const rotate = useTransform(x, [-300, 300], [-15, 15]);
 
-  const completeSwipe = useCallback(
-    (direction) => {
-      if (isExiting) return;
-      setIsExiting(true);
+  // Overlay opacity control
+  const likeOpacity = useTransform(x, [0, 100], [0, 1]);
+  const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
+
+  const handleSwipe = useCallback(
+    async (direction) => {
       const status = direction === "right" ? "interested" : "ignored";
-      const exitX = direction === "right" ? EXIT_VELOCITY : -EXIT_VELOCITY;
-      setDragX(exitX);
-      setTimeout(() => {
-        handleRequest(status, _id);
-      }, ANIMATION_DURATION_MS);
+
+      setTimeout(async () => {
+        await sendRequest(status, _id);
+        dispatch(removeFeedUser(_id));
+      }, 300);
     },
-    [_id, handleRequest, isExiting],
+    [_id, dispatch]
   );
-
-  const handlePointerDown = useCallback((e) => {
-    if (isBack) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    startXRef.current = clientX;
-    setIsDragging(true);
-  }, [isBack]);
-
-  const handlePointerMove = useCallback(
-    (e) => {
-      if (!isDragging || isBack) return;
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const delta = clientX - startXRef.current;
-      setDragX(Math.max(-350, Math.min(350, delta)));
-    },
-    [isDragging, isBack],
-  );
-
-  const handlePointerUp = useCallback(() => {
-    if (!isDragging || isBack) return;
-    setIsDragging(false);
-    if (Math.abs(dragX) >= SWIPE_THRESHOLD) {
-      completeSwipe(dragX > 0 ? "right" : "left");
-    } else {
-      setDragX(0);
-    }
-  }, [isDragging, isBack, dragX, completeSwipe]);
-
-  useEffect(() => {
-    if (!isDragging || isBack) return;
-    const opts = { passive: false };
-    const onTouchMove = (e) => {
-      handlePointerMove(e);
-      if (e.cancelable) e.preventDefault();
-    };
-    document.addEventListener("mousemove", handlePointerMove);
-    document.addEventListener("mouseup", handlePointerUp);
-    document.addEventListener("touchmove", onTouchMove, opts);
-    document.addEventListener("touchend", handlePointerUp);
-    return () => {
-      document.removeEventListener("mousemove", handlePointerMove);
-      document.removeEventListener("mouseup", handlePointerUp);
-      document.removeEventListener("touchmove", onTouchMove);
-      document.removeEventListener("touchend", handlePointerUp);
-    };
-  }, [isDragging, isBack, handlePointerMove, handlePointerUp]);
 
   if (!users) return null;
 
-  const rotation = dragX / 15;
-  const showLike = dragX > SWIPE_THRESHOLD;
-  const showNope = dragX < -SWIPE_THRESHOLD;
-
-  const cardStyle = {
-    transform: `translateX(${dragX}px) rotate(${rotation}deg)`,
-    transition: isDragging
-      ? "none"
-      : `transform ${ANIMATION_DURATION_MS / 1000}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
-    cursor: isBack ? "default" : "grab",
-    userSelect: "none",
-    touchAction: isBack ? "auto" : "none",
-  };
-
-  const baseCardClass =
-    "w-full max-w-sm bg-base-100 border border-base-300 rounded-2xl shadow-2xl overflow-hidden select-none " +
-    (isBack ? "scale-[0.92] opacity-90" : "scale-100");
-
   return (
-    <div
-      ref={cardRef}
-      className={`flex justify-center items-center w-full min-h-[70vh] px-4 ${isBack ? "absolute inset-0" : "relative"}`}
-      style={isBack ? { zIndex: 0 } : { zIndex: 1 }}
+    <motion.div
+      drag={!isBack ? "x" : false}
+      style={{ x, rotate }}
+      dragConstraints={{ left: 0, right: 0 }}
+      onDragEnd={(e, info) => {
+        if (info.offset.x > SWIPE_THRESHOLD) {
+          handleSwipe("right");
+        } else if (info.offset.x < -SWIPE_THRESHOLD) {
+          handleSwipe("left");
+        }
+      }}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{
+        scale: isBack ? 0.92 : 1,
+        opacity: 1,
+      }}
+      exit={{ opacity: 0, scale: 0.5 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className={`absolute cursor-pointer w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.8)] border border-white/10
+      bg-gradient-to-br from-slate-900 to-slate-800 backdrop-blur-xl
+      ${isBack ? "z-0" : "z-10"}`}
     >
-      <div
-        className={baseCardClass}
-        style={cardStyle}
-        onMouseDown={handlePointerDown}
-        onTouchStart={handlePointerDown}
-        role={isBack ? undefined : "button"}
-        aria-label={isBack ? undefined : "Swipe card"}
-      >
-        {!isBack && (
-          <>
-            <div
-              className={`absolute inset-0 z-10 flex items-center justify-start pl-6 rounded-2xl pointer-events-none transition-opacity duration-150 ${
-                showNope ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <span className="text-4xl font-black text-pink-500 border-4 border-pink-500 rounded-xl px-4 py-2 -rotate-12">
-                NOPE
-              </span>
-            </div>
-            <div
-              className={`absolute inset-0 z-10 flex items-center justify-end pr-6 rounded-2xl pointer-events-none transition-opacity duration-150 ${
-                showLike ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <span className="text-4xl font-black text-emerald-500 border-4 border-emerald-500 rounded-xl px-4 py-2 rotate-12">
-                LIKE
-              </span>
-            </div>
-          </>
-        )}
+      {/* LIKE Overlay */}
+      {!isBack && (
+        <motion.div
+          style={{ opacity: likeOpacity }}
+          className="absolute top-8 right-6 z-20"
+        >
+          <span className="text-3xl font-black text-emerald-400 border-4 border-emerald-400 px-4 py-2 rounded-xl rotate-12 bg-black/50 backdrop-blur-md">
+            LIKE
+          </span>
+        </motion.div>
+      )}
 
-        <CardContent user={users} />
+      {/* NOPE Overlay */}
+      {!isBack && (
+        <motion.div
+          style={{ opacity: nopeOpacity }}
+          className="absolute top-8 left-6 z-20"
+        >
+          <span className="text-3xl font-black text-pink-500 border-4 border-pink-500 px-4 py-2 rounded-xl -rotate-12 bg-black/50 backdrop-blur-md">
+            NOPE
+          </span>
+        </motion.div>
+      )}
 
-        {!isBack && (
-          <div className="flex justify-center gap-6 px-6 pb-6 pt-2 w-full">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                completeSwipe("left");
-              }}
-              className="btn flex-1 bg-base-200 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition"
-            >
-              Ignore ✕
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                completeSwipe("right");
-              }}
-              className="btn flex-1 bg-base-200 border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white transition"
-            >
-              Interested ➤
-            </button>
-          </div>
-        )}
+      {/* Image */}
+      <div className="relative h-72 overflow-hidden">
+        <img
+          src={users.photoURL}
+          alt="Profile"
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
       </div>
-    </div>
+
+      {/* Info */}
+      <div className="p-6 text-center text-white">
+        <h2 className="text-2xl font-bold">
+          {users.firstName} {users.lastName}
+        </h2>
+        <p className="text-gray-400 text-sm mt-1">
+          {users.age} • {users.gender}
+        </p>
+        <p className="text-gray-300 mt-4 text-sm line-clamp-3">
+          {users.about || "No bio available."}
+        </p>
+      </div>
+
+      {!isBack && (
+        <div className="flex gap-6 p-6">
+          <button
+            onClick={() => handleSwipe("left")}
+            className="flex-1 py-3 rounded-xl cursor-pointer border border-pink-500 text-pink-400 hover:bg-pink-500 hover:text-white transition-all duration-300"
+          >
+            Ignore ✕
+          </button>
+
+          <button
+            onClick={() => handleSwipe("right")}
+            className="flex-1 py-3 cursor-pointer rounded-xl border border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black transition-all duration-300"
+          >
+            Interested ➤
+          </button>
+        </div>
+      )}
+    </motion.div>
   );
 };
 
