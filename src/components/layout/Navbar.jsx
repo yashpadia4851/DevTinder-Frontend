@@ -107,7 +107,7 @@ const Navbar = () => {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden text-white focus:outline-none"
             >
-              <div className="w-6 h-6 flex flex-col justify-between">
+              <div className="w-6 h-6 flex flex-col justify-between cursor-pointer">
                 <span className="block h-0.5 bg-white rounded"></span>
                 <span className="block h-0.5 bg-white rounded"></span>
                 <span className="block h-0.5 bg-white rounded"></span>
@@ -125,9 +125,9 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-gradient-to-br from-slate-900 to-slate-800 border-t border-white/10"
+            className="md:hidden bg-linear-to-br  from-slate-900 to-slate-800 border-t border-white/10"
           >
-            <div className="flex flex-col p-4 space-y-3">
+            <div className="flex flex-col p-4 space-y-3 ">
               <Link
                 to="/feed"
                 onClick={() => setMobileOpen(false)}

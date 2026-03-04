@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchConnections } from "../../api/connectionsApi";
 import { setConnections } from "../../store/slices/connectionsSlice";
 
@@ -103,7 +103,7 @@ const Connections = () => {
                 <div className="card-body">
                   <div className="flex items-start justify-between gap-2">
                     <h2 className="card-title text-base">
-                      {(c.firstName || "Unknown")} {(c.lastName || "")}
+                      {c.firstName || "Unknown"} {c.lastName || ""}
                     </h2>
                     <div className="badge badge-neutral">
                       {c.age ? c.age : "—"}
@@ -123,6 +123,12 @@ const Connections = () => {
                       No bio added.
                     </p>
                   )}
+
+                  <Link to={`/chat/${c._id}`} state={{ userData: c }}>
+                    <button className="btn btn-sm btn-primary mt-3 w-full">
+                      Chat
+                    </button>
+                  </Link>
                 </div>
               </div>
             ))}
