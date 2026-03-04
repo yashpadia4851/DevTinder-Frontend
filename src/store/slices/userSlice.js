@@ -17,7 +17,6 @@ const userSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       const user = action.payload;
-      console.log("[userSlice] setUser called", user ? { _id: user._id } : "null");
       try {
         if (user) {
           localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));

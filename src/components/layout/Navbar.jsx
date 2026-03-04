@@ -34,7 +34,6 @@ const Navbar = () => {
   return (
     <div className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-
         {/* Logo */}
         <Link
           to="/feed"
@@ -55,12 +54,14 @@ const Navbar = () => {
             <Link to="/request" className={navLinkClass("/request")}>
               Requests
             </Link>
+            <Link to="/premium" className={navLinkClass("/premium")}>
+              Premium
+            </Link>
           </div>
         )}
 
         {/* Right Section */}
         <div className="flex items-center gap-4">
-
           {/* Avatar (Desktop only) */}
           {user && (
             <div className="hidden md:block relative group">
@@ -74,14 +75,11 @@ const Navbar = () => {
 
               {/* Dropdown */}
               <div className="absolute right-0 mt-3 w-52 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 border border-white/10 shadow-2xl backdrop-blur-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-
                 <div className="p-4 border-b border-white/10">
                   <p className="text-white font-semibold">
                     {user.firstName} {user.lastName}
                   </p>
-                  <p className="text-gray-400 text-sm">
-                    {user.email}
-                  </p>
+                  <p className="text-gray-400 text-sm">{user.email}</p>
                 </div>
 
                 <div className="flex flex-col p-2">
@@ -130,7 +128,6 @@ const Navbar = () => {
             className="md:hidden bg-gradient-to-br from-slate-900 to-slate-800 border-t border-white/10"
           >
             <div className="flex flex-col p-4 space-y-3">
-
               <Link
                 to="/feed"
                 onClick={() => setMobileOpen(false)}
@@ -156,6 +153,14 @@ const Navbar = () => {
               </Link>
 
               <Link
+                to="/premium"
+                onClick={() => setMobileOpen(false)}
+                className={navLinkClass("/premium")}
+              >
+                Premium
+              </Link>
+
+              <Link
                 to="/profile"
                 onClick={() => setMobileOpen(false)}
                 className="px-4 py-2 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition no-underline"
@@ -169,7 +174,6 @@ const Navbar = () => {
               >
                 Logout
               </button>
-
             </div>
           </motion.div>
         )}

@@ -8,6 +8,7 @@ import Feed from "./features/feed/Feed";
 import Profile from "./features/profile/Profile";
 import Connections from "./features/connections/Connections";
 import Requests from "./features/requests/Requests";
+import Premium from "./features/Premium/Premium";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="connections" element={<Connections />} />
             <Route path="request" element={<Requests />} />
+            <Route path="premium" element={<Premium />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

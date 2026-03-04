@@ -6,7 +6,6 @@ const ProtectedRoute = () => {
   const { authStatus, verifySession } = useAuth();
 
   useEffect(() => {
-    console.log("[ProtectedRoute] Mounted, calling verifySession");
     verifySession();
   }, [verifySession]);
 
